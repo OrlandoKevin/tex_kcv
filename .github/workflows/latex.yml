@@ -31,6 +31,7 @@ jobs:
         run: |
           mkdir -p pdf
           cp main.pdf pdf/
+          touch pdf/.nojekyll
 
       - name: Deploy PDF to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
