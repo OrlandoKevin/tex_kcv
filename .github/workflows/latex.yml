@@ -6,9 +6,12 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: write
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -24,12 +27,17 @@ jobs:
           name: main-pdf
           path: main.pdf
 
+      - name: Prepare PDF for Pages
+        run: |
+          mkdir -p pdf
+          cp main.pdf pdf/
+
       - name: Deploy PDF to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         if: github.ref == 'refs/heads/main'
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .
+          publish_dir: ./pdf
           publish_branch: gh-pages
           keep_files: true
           force_orphan: true
@@ -41,5 +49,3 @@ jobs:
           commit_message: 'Deploy PDF to GitHub Pages'
           exclude_assets: ''
           destination_dir: .
-          # Only publish the PDF
-          include_assets: main.pdf
