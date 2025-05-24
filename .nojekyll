@@ -1,0 +1,2 @@
+# .nojekyll
+Empêche GitHub Pages de traiter le dépôt comme un site Jekyll, ce qui permet de servir le PDF directement.
