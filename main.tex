@@ -1,66 +1,409 @@
-\documentclass{article}
-\usepackage[utf8]{inputenc}
-\usepackage{graphicx}
-\usepackage{booktabs}
-\usepackage{caption}
-\usepackage{float}
+\documentclass[10pt, letterpaper]{article}
 
-\title{Exemple d'Article LaTeX}
-\author{Jean Dupont}
-\date{24 mai 2025}
+% Packages:
+\usepackage[
+  ignoreheadfoot, % set margins without considering header and footer
+  top=2 cm, % seperation between body and page edge from the top
+  bottom=2 cm, % seperation between body and page edge from the bottom
+  left=2 cm, % seperation between body and page edge from the left
+  right=2 cm, % seperation between body and page edge from the right
+  footskip=1.0 cm, % seperation between body and footer
+  % showframe % for debugging 
+]{geometry} % for adjusting page geometry
+\usepackage{titlesec} % for customizing section titles
+\usepackage{tabularx} % for making tables with fixed width columns
+\usepackage{array} % tabularx requires this
+\usepackage[dvipsnames]{xcolor} % for coloring text
+\definecolor{primaryColor}{RGB}{0, 79, 144} % define primary color
+\usepackage{enumitem} % for customizing lists
+\usepackage{fontawesome5} % for using icons
+\usepackage{amsmath} % for math
+\usepackage[
+  pdftitle={CV - korlando},
+  pdfauthor={Kevin Bosirany ORLANDO},
+  pdfcreator={LaTeX with RenderCV},
+  colorlinks=true,
+  urlcolor=primaryColor
+]{hyperref} % for links, metadata and bookmarks
+\usepackage[pscoord]{eso-pic} % for floating text on the page
+\usepackage{calc} % for calculating lengths
+\usepackage{bookmark} % for bookmarks
+\usepackage{lastpage} % for getting the total number of pages
+\usepackage{changepage} % for one column entries (adjustwidth environment)
+\usepackage{paracol} % for two and three column entries
+\usepackage{ifthen} % for conditional statements
+\usepackage{needspace} % for avoiding page brake right after the section title
+\usepackage{iftex} % check if engine is pdflatex, xetex or luatex
+
+% Ensure that generate pdf is machine readable/ATS parsable:
+\ifPDFTeX
+  \input{glyphtounicode}
+  \pdfgentounicode=1
+  % \usepackage[T1]{fontenc} % this breaks sb2nov
+  \usepackage[utf8]{inputenc}
+  \usepackage{lmodern}
+\fi
+
+% Some settings:
+\AtBeginEnvironment{adjustwidth}{\partopsep0pt} % remove space before adjustwidth environment
+\pagestyle{empty} % no header or footer
+\setcounter{secnumdepth}{0} % no section numbering
+\setlength{\parindent}{0pt} % no indentation
+\setlength{\topskip}{0pt} % no top skip
+\setlength{\columnsep}{0cm} % set column seperation
+\makeatletter
+\let\ps@customFooterStyle\ps@plain % Copy the plain style to customFooterStyle
+\patchcmd{\ps@customFooterStyle}{\thepage}{
+%  \color{gray}\textit{\small Kevin Bosirany ORLANDO - Page \thepage{} of \pageref*{LastPage}}
+}{}{} % replace number by desired string
+\makeatother
+\pagestyle{customFooterStyle}
+
+\titleformat{\section}{\needspace{4\baselineskip}\bfseries\large}{}{0pt}{}[\vspace{1pt}\titlerule]
+
+\titlespacing{\section}{
+  % left space:
+  -1pt
+}{
+  % top space:
+  0.3 cm
+}{
+  % bottom space:
+  0.2 cm
+} % section title spacing
+
+\renewcommand\labelitemi{$\circ$} % custom bullet points
+\newenvironment{highlights}{
+  \begin{itemize}[
+    topsep=0.10 cm,
+    parsep=0.10 cm,
+    partopsep=0pt,
+    itemsep=0pt,
+    leftmargin=0.4 cm + 10pt
+  ]
+}{
+  \end{itemize}
+} % new environment for highlights
+
+\newenvironment{highlightsforbulletentries}{
+  \begin{itemize}[
+    topsep=0.10 cm,
+    parsep=0.10 cm,
+    partopsep=0pt,
+    itemsep=0pt,
+    leftmargin=10pt
+  ]
+}{
+  \end{itemize}
+} % new environment for highlights for bullet entries
+
+
+\newenvironment{onecolentry}{
+  \begin{adjustwidth}{
+    0.2 cm + 0.00001 cm
+  }{
+    0.2 cm + 0.00001 cm
+  }
+}{
+  \end{adjustwidth}
+} % new environment for one column entries
+
+\newenvironment{twocolentry}[2][]{
+  \onecolentry
+  \def\secondColumn{#2}
+  \setcolumnwidth{\fill, 4.5 cm}
+  \begin{paracol}{2}
+}{
+  \switchcolumn \raggedleft \secondColumn
+  \end{paracol}
+  \endonecolentry
+} % new environment for two column entries
+
+\newenvironment{header}{
+  \setlength{\topsep}{0pt}\par\kern\topsep\centering\linespread{1.5}
+}{
+  \par\kern\topsep
+} % new environment for the header
+
+\newcommand{\placelastupdatedtext}{% \placetextbox{<horizontal pos>}{<vertical pos>}{<stuff>}
+  \AddToShipoutPictureFG*{% Add <stuff> to current page foreground
+  \put(
+    \LenToUnit{\paperwidth-2 cm-0.2 cm+0.05cm},
+    \LenToUnit{\paperheight-1.0 cm}
+  ){\vtop{{\null}\makebox[0pt][c]{
+    %\small\color{gray}\textit{Dernière mise à jour de Avril 2025}\hspace{\widthof{Last updated in September 2024}}
+  }}}%
+  }%
+}%
+
+% save the original href command in a new command:
+\let\hrefWithoutArrow\href
+
+% new command for external links:
+\renewcommand{\href}[2]{\hrefWithoutArrow{#1}{\ifthenelse{\equal{#2}{}}{ }{#2 }\raisebox{.15ex}{\footnotesize \faExternalLink*}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 
-\maketitle
+\newcommand{\AND}{\unskip
+  \cleaders\copy\ANDbox\hskip\wd\ANDbox
+  \ignorespaces
+}
+\newsavebox\ANDbox
+\sbox\ANDbox{}
 
-\begin{abstract}
-Cet article présente un exemple complet de document LaTeX avec titres, paragraphes, tableaux et graphiques.
-\end{abstract}
+\placelastupdatedtext
+\begin{header}
+  \textbf{\fontsize{20 pt}{20 pt}\selectfont Kevin Bosirany ORLANDO}
 
-\section{Introduction}
+  \vspace{0.3 cm}
 
-LaTeX est un système de composition de documents très utilisé pour la rédaction scientifique. Voici un exemple d'article structuré.
+  \normalsize
+  \mbox{{\color{black}\footnotesize\faMapMarker*}\hspace*{0.13cm}Montpellier, France}%
+  \kern 0.25 cm%
+  \AND%
+  \kern 0.25 cm%
+  \mbox{\hrefWithoutArrow{mailto:kevinbosirany@gmail.com}{\color{black}{\footnotesize\faEnvelope[regular]}\hspace*{0.13cm}kevinbosirany@gmail.com}}%
+  \kern 0.25 cm%
+  \AND%
+  \kern 0.25 cm%
+  \mbox{\hrefWithoutArrow{tel:+33-762-204-28-40}{\color{black}{\footnotesize\faPhone*}\hspace*{0.13cm}+33 (0)7 62 04 28 40}}%
+  \kern 0.25 cm%
+  \AND%
+  \kern 0.25 cm%
+  \mbox{\hrefWithoutArrow{https://linkedin.com/in/kevin-bosirany-orlando}{\color{black}{\footnotesize\faLinkedinIn}\hspace*{0.13cm}kevin-bosirany-orlando}}%
+  \kern 0.25 cm%
+  \AND%
+  \kern 0.25 cm%
+  \mbox{\hrefWithoutArrow{https://github.com/OrlandoKevin}{\color{black}{\footnotesize\faGithub}\hspace*{0.13cm}OrlandoKevin}}%
+\end{header}
 
-\section{Méthodologie}
+\vspace{0.3 cm - 0.3 cm}
 
-Nous présentons ici la méthodologie utilisée pour générer les données et les graphiques.
+% Profil
+\section{Profil}
 
-\subsection{Données}
+\begin{onecolentry}
+  Ingénieur génie rural spécialisé dans la gestion de l'eau, avec deux ans d'
+  expérience en modélisation hydrologique, hydraulique et agronomique.
+  Compétences en programmation scientifique, en modélisation des systèmes
+  hydrologiques complexes et en analyse de données.
+  Autonome, rigoureux et passionné par la recherche et l'innovation dans le
+  domaine de l'eau et de l'agriculture.
+  Recherche un poste dans la gestion de l'eau, à travers des études
+  hydrologiques, hydrauliques ainsi que l'adaptation face aux changements
+  globaux.
+\end{onecolentry}
 
-Les données utilisées sont fictives et servent d'exemple.
+% Expériences professionelles
+\section{Expériences professionnelles}
 
-\section{Résultats}
+% INRAE -IE
+\begin{twocolentry}
+{
+  \textit{Montpellier, France}
+  
+  \textit{Sept 2023 – Aujourd'hui}
+} {
+  \textbf{Ingénieur d'études}
 
-\subsection{Tableau de résultats}
+  Chargé de modélisation hydrologique et agronomique
 
-\begin{table}[H]
-    \centering
-    \caption{Exemple de tableau de résultats}
-    \begin{tabular}{lcc}
-        \toprule
-        Catégorie & Valeur 1 & Valeur 2 \\
-        \midrule
-        A & 10 & 20 \\
-        B & 15 & 25 \\
-        C & 12 & 22 \\
-        \bottomrule
-    \end{tabular}
-\end{table}
+  \textit{INRAE - UMR G-EAU / UMR Innovation}
+}
+\end{twocolentry}
 
-\subsection{Graphique}
+\vspace{0.10 cm}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{example-image-a}
-    \caption{Exemple de graphique (remplacer par votre image)}
-\end{figure}
+\begin{onecolentry}
+  \begin{highlights}
+    \item{
+      Modèle Optirrig (Génération, analyse et optimisation des scénarios d'
+      irrigation des cultures)
+      \begin{itemize}
+        \item Développement et maintenance du package R du modèle (OptirrigCORE)
+        \item Développement et implémentation des formalismes du modèle
+        (développement des plantes, bilan hydrique, etc.)
+      \end{itemize}
+    }
+    \item{
+      Projet JOICE (Joint Optimization of Irrigation and Control of irrigation
+      induced Erosion)
+      \begin{itemize}
+        \item Étude du couplage des modèles Optirrig et Mahleran (Model for
+        Assessing Hillslope-Landscape Erosion, Runoff and Nutrients)
+      \end{itemize}
+    }
+    \item{
+      Projet TALANOA-WATER
+      \begin{itemize}
+        \item Modélisation des règles de gestion des infrastructures
+        hydrauliques (réservoirs, canaux, etc.)
+        \item Initiation du couplage du modèle intégré hydro-agro-économique
+        TALANOA
+      \end{itemize}
+    }
+  \end{highlights}
+\end{onecolentry}
 
-\section{Discussion}
+\vspace{0.2 cm}
 
-Les résultats présentés montrent la structure d'un article scientifique type.
+% INRAE
+\begin{twocolentry} {
+  \textit{Montpellier, France}  
+  
+  \textit{Mars – Août 2023}
+} {
+  \textbf{Stagiaire}
 
-\section{Conclusion}
+  Stage de fin d'études
+  
+  \textit{INRAE - UMR G-EAU / UMR Innovation - Projet TALANOA-WATER}
+}
+\end{twocolentry}
 
-Cet exemple illustre l'utilisation de LaTeX pour la rédaction d'articles avec des éléments variés.
+\vspace{0.10 cm}
+
+\begin{onecolentry}
+  \begin{highlights}
+    \item Modélisation du réseau hydrographique et hydraulique du bassin
+    versant de l'Aude
+    \item Calage du modèle
+    \item Etude d'impact du changement climatique sur les ressources en eau
+    (Volumes Prélevables)
+  \end{highlights}
+\end{onecolentry}
+
+\vspace{0.2 cm}
+
+% IAV
+\begin{twocolentry}
+  {
+    \textit{Rabat, Maroc}
+
+    \textit{Fév - Juil 2022}
+  }
+  {
+    \textbf{Stagiaire}
+
+    Stage de fin d'études
+
+    \textit{Institut Agronomique et Vétérinaire Hassan II - Département
+    Génie Rural}
+  }
+\end{twocolentry}
+
+\vspace{0.10 cm}
+
+\begin{onecolentry}
+  \begin{highlights}
+    \item Détermination de la consommation et de la productivité de l'eau
+    dans le bassin de l'Oum Er Rbia
+    \item Acquisition, traitement et analyse des données issues de la
+    télédétection (FAO WaPOR)
+  \end{highlights}
+\end{onecolentry}
+
+\vspace{0.2 cm}
+
+% ADI
+\begin{twocolentry}
+  {
+    \textit{Rabat, Maroc}
+
+    \textit{Juil - Sept 2021}
+  }
+  {
+    \textbf{Stagiaire}
+
+    Stage d'insertion en milieu professionnel
+
+    \textit{ADI (Compagnie d'Aménagement et de Développement Industriel)}
+  }
+\end{twocolentry}
+
+\vspace{0.10 cm}
+
+\begin{onecolentry}
+  \begin{highlights}
+    \item Dimensionnement du réseau projeté pour la reconversion en irrigation
+    localisée du secteur RD1 du périmètre de la Tessaout aval
+  \end{highlights}
+\end{onecolentry}
+  
+% Parcours académiques
+\section{Parcours académiques}
+% EA
+\begin{twocolentry}
+  {
+  \textit{Montpellier, France}
+
+  \textit{Sept 2022 – Sept 2023}
+  }
+  {
+    \textbf{Master 2 Science de l'Eau - Eau et Agriculture}
+
+    \textit{Université de Montpellier - Institut Agro Montpellier - AgroParisTech}
+  }
+\end{twocolentry}
+
+\vspace{0.2 cm}
+
+% GR
+\begin{twocolentry}
+  {
+    \textit{Rabat, Maroc}
+
+    \textit{Sept 2019 – Juil 2022}
+  }
+  {
+    \textbf{Ingénieur Génie Rural - Eau, Environnement et Infrastructures}
+
+    \textit{Institut Agronomique et Vétérinaire Hassan II}
+  }
+\end{twocolentry}
+
+\vspace{0.2 cm}
+
+% Hydraulique
+
+\begin{twocolentry}
+  {
+    \textit{Antananarivo, Madagascar}
+
+    \textit{}
+  }
+  {
+    \textbf{Licence Génie Civil - Hydraulique et Aménagement}
+
+    \textit{Ecole Supérieure Polytechnique d'Antananarivo}
+  }
+\end{twocolentry}
+
+% Compétences
+\section{Compétences}
+  %  
+  \begin{onecolentry}
+    \textbf{Langage de programmation:} R, Python, Fortran
+  \end{onecolentry}
+
+  \vspace{0.2 cm}
+
+  \begin{onecolentry}
+    \textbf{Versioning:} Git, Gitlab, Github, CI/CD
+  \end{onecolentry}
+
+  \vspace{0.2 cm}
+
+  \begin{onecolentry}
+    \textbf{Logiciels:} Microsoft Office, CAO/DAO, Epanet, PVSyst, Minitab, SPSS, etc.
+  \end{onecolentry}
+
+  \vspace{0.2 cm}
+
+  \begin{onecolentry}
+    \textbf{OS:} Windows, Linux
+  \end{onecolentry}
 
 \end{document}
